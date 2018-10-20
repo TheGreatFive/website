@@ -6,6 +6,7 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     router = express.Router();
     appRoutes = require('./app/routes/api')(router),
+    locationRoutes = require('./app/routes/locations')(router); //Throw away file
     path = require('path');
 
 var app = express();
@@ -14,7 +15,10 @@ var port = process.env.PORT || 8080;
 app.use(morgan('dev')); //To log http requests to console (helpful for debugging)
 app.use(bodyParser.json()); //To parse application/json form requests
 app.use(bodyParser.urlencoded({ extended: true})); //To parse application/x-www-urlencoded form requests
+
 app.use('/api', appRoutes); //Back-end routes http://<url>/api
+app.use('/locationApi', locationRoutes); //Back-end routes for location (throw away)
+
 app.use(express.static(__dirname + '/public')); //Giving the front-end access to this folder
 
 //Connecting to database
