@@ -6,11 +6,7 @@ var mongoose = require('mongoose');
     Schema = mongoose.Schema;
 
 var LocationSchema = new Schema ({
-    city: {
-        type: String,
-        required: true
-    },
-    state: {
+    address: {
         type: String,
         required: true
     },
@@ -19,6 +15,10 @@ var LocationSchema = new Schema ({
         required: true
     },
     latitude: {
+        type: Number,
+        required: true
+    },
+    frequency: {
         type: Number,
         required: true
     }

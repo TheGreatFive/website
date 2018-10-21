@@ -12,8 +12,8 @@ module.exports = function(router){
     // Taking advantage of mapbox api
     router.use('/addLocation', function(req, res, next){
         req.coordinate = null;
-        if(req.body.city && req.body.state){
-            var queryData = req.body.city + ', ' + req.body.state;
+        if(req.body.address){
+            var queryData = req.body.address;
             geocodingClient.forwardGeocode({
                 query: queryData,
                 limit: 1
@@ -28,7 +28,7 @@ module.exports = function(router){
     // Adding a location into the database
     // http://<url>/location-api/addLocation
     router.post('/addLocation', function(req, res){
-        var location = new Location();
+        var newLocation = new Location;
 
         if(req.coordinate == null){
             res.json({
@@ -37,24 +37,36 @@ module.exports = function(router){
             });
         }
         else{
-            location.city = req.body.city;
-            location.state = req.body.state;
-            location.longitude = req.coordinate[0];
-            location.latitude = req.coordinate[1];
+            newLocation.address = req.body.address;
+            newLocation.longitude = req.coordinate[0];
+            newLocation.latitude = req.coordinate[1];
+            newLocation.frequency = 100;
 
-            location.save(function(err){
-                if(err){
-                    res.json({
-                        success: false,
-                        message: 'Could not save location in database'
-                    });
+            Location.findOne({address: req.body.address}, function(err, location){
+                if(err) throw err;
+
+                if(location){
+                    console.log("Found Location; Updating frequency");
+                    location.frequency = location.frequency + 1;
                 }
                 else{
-                    res.json({
-                        success: true,
-                        message: 'Successfully saved location in database'
-                    });
+                    location = newLocation;
                 }
+
+                location.save(function(err){
+                    if(err){
+                        res.json({
+                            success: false,
+                            message: 'Could not save location in database'
+                        });
+                    }
+                    else{
+                        res.json({
+                            success: true,
+                            message: 'Successfully saved location in database'
+                        });
+                    }
+                });
             });
         }
     });
@@ -74,7 +86,8 @@ module.exports = function(router){
                 geojson.features.push({
                     "type": "Feature",
                     "properties" : {
-                        "name": locations[index].city + ", " + locations[index].state
+                        "name": locations[index].address,
+                        "frequency": locations[index].frequency
                     },
                     "geometry" : {
                         "type": "Point",
@@ -82,7 +95,7 @@ module.exports = function(router){
                     }
                 });
             }
-            res.json(geojson);
+            res.send(geojson);
         });
     });
 

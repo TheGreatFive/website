@@ -11,6 +11,9 @@ angular.module('profileController', ['locationServices'])
             template: "<div id='map'><div>", //Way to load map in the html file
             link: function(scope, element, attributes) {
 
+                //Obtaining photoLocations from back-end to render on map
+                scope.getPhotoLocations();
+
                 //Initial load of the map
                 mapboxgl.accessToken = 'pk.eyJ1IjoiZG91Z2FndWVycmEiLCJhIjoiY2puNHpwNGk4MDA3azNrbGttMnlndTd6YSJ9.zPFiViInpT-AH8lhvsOE8A';
                 var map = new mapboxgl.Map({
@@ -25,34 +28,32 @@ angular.module('profileController', ['locationServices'])
                 });
                 map.addControl(geocoder);
 
-                //Updates map location to the user's current location
-                scope.updateMapLocation = function(longitude, latitude) {
-                    map.jumpTo({
-                        center: [longitude, latitude],
-                        zoom: 12
-                    });
 
+                //On loading the map creating a heat-map layer and placing circles
+                //on the locations where pictures have been posted
+                map.on('load', function() {
                     map.addSource('photoLocation', {
                         "type": "geojson",
                         "data": scope.geojson
                     });
-
                     map.addLayer({
                         "id": "photoLocation-heat",
                         "type": "heatmap",
                         "source": "photoLocation",
                         "maxzoom": 9,
                         "paint": {
-                            // Increase the heatmap weight based on frequency and property magnitude
+                            // Increase the heatmap weight based on frequency of locations
+                            // When frequency: 0 => weight: 0; frequency: 50 => weight: 3
                             "heatmap-weight": [
                                 "interpolate",
                                 ["linear"],
-                                ["get", "mag"],
+                                ["get", "frequency"],
                                 0, 0,
-                                6, 1
+                                10, 1,
+                                100, 2
                             ],
-                            // Increase the heatmap color weight weight by zoom level
-                            // heatmap-intensity is a multiplier on top of heatmap-weight
+                            // Heatmap-intensity is a multiplier on top of heatmap-weight
+                            // When zoom: 0 => weight: 1; zoom: 9 => weight: 3
                             "heatmap-intensity": [
                                 "interpolate",
                                 ["linear"],
@@ -91,45 +92,45 @@ angular.module('profileController', ['locationServices'])
                                 9, 0
                             ],
                         }
-                    }, 'waterway-label');
-                    
+                    });
+                    //Adding circles to the map at the photo-locations, displayed when zooming in
                     map.addLayer({
                         "id": "photoLocation-point",
                         "type": "circle",
                         "source": "photoLocation",
-                        "minzoom": 7,
+                        "minzoom": 8,
                         "paint": {
-                            // Size circle radius by earthquake magnitude and zoom level
+                            // Size circle radius by frequency and zoom level
                             "circle-radius": [
                                 "interpolate",
                                 ["linear"],
-                                ["zoom"],
-                                7, [
+                                ["get", "frequency"],
+                                8, [
                                     "interpolate",
                                     ["linear"],
-                                    ["get", "mag"],
-                                    1, 1,
-                                    6, 4
-                                ],
-                                16, [
-                                    "interpolate",
-                                    ["linear"],
-                                    ["get", "mag"],
+                                    ["get", "frequency"],
                                     1, 5,
-                                    6, 50
+                                    100, 7
+                                ],
+                                15, [
+                                    "interpolate",
+                                    ["linear"],
+                                    ["get", "frequency"],
+                                    1, 8,
+                                    100, 12
                                 ]
                             ],
                             // Color circle by earthquake magnitude
                             "circle-color": [
                                 "interpolate",
                                 ["linear"],
-                                ["get", "mag"],
-                                1, "rgba(33,102,172,0)",
-                                2, "rgb(103,169,207)",
-                                3, "rgb(209,229,240)",
-                                4, "rgb(253,219,199)",
-                                5, "rgb(239,138,98)",
-                                6, "rgb(178,24,43)"
+                                ["get", "frequency"],
+                                0, "rgba(33,102,172,0)",
+                                1, "rgb(103,169,207)",
+                                20, "rgb(209,229,240)",
+                                40, "rgb(253,219,199)",
+                                80, "rgb(239,138,98)",
+                                100, "rgb(178,24,43)"
                             ],
                             "circle-stroke-color": "white",
                             "circle-stroke-width": 1,
@@ -139,11 +140,19 @@ angular.module('profileController', ['locationServices'])
                                 ["linear"],
                                 ["zoom"],
                                 7, 0,
-                                8, 1
+                                8, 0.5,
+                                9, 1
                             ]
                         }
-                    }, 'waterway-label');
+                    });
+                });
 
+                //Updates map location to the user's current location
+                scope.updateMapLocation = function(longitude, latitude) {
+                    map.jumpTo({
+                        center: [longitude, latitude],
+                        zoom: 5
+                    });
                 };
             }
         };
@@ -155,21 +164,24 @@ angular.module('profileController', ['locationServices'])
         profile.showMap = false;
         profile.showProfile = true;
 
-        //Toggle to display map
-        profile.displayMap = function() {
+        //Retreiving the photo locations from the server
+        //Calling a service from locationServices
+        $scope.getPhotoLocations = function(){
             Locations.getLocations().then(function(data) {
+                console.log(data.data);
                 $scope.geojson = data.data;
             });
+        }
 
-            profile.getUserLocation();
-            profile.showMap = true;
-            profile.showProfile = false;
-        };
+        //Toggle display between map and profile
+        profile.toggleDisplay = function(){
+            profile.showMap = !profile.showMap;
+            profile.showProfile = !profile.showProfile;
 
-        //Toggle to display profile
-        profile.displayProfile = function() {
-            profile.showMap = false;
-            profile.showProfile = true;
+            if(profile.showMap){
+                console.log('here');
+                profile.getUserLocation();
+            }
         };
 
         //Requesting user's current location to update map view
