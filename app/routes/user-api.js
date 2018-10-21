@@ -1,6 +1,6 @@
 /*
     This file contains the backend routes that are called by the front-end to contact the database.
-    Routes are specified by http://<url>/api/<route>
+    Routes are specified by http://<url>/user-api/<route>
 */
 var User = require('../models/user');
 var jwt = require('jsonwebtoken'); //Used to keep the user logged in with cookies
@@ -9,7 +9,7 @@ var secret = "GreatFiveTokenGenerator";
 module.exports = function(router) {
 
     //User registration route
-    //Handles the route for http://<url>/api/users
+    //Handles the route for http://<url>/user-api/users
     router.post('/users', function(req, res) {
         var user = new User();
         user.username = req.body.username;
@@ -39,7 +39,7 @@ module.exports = function(router) {
     });
 
     //User Login Routes
-    //http://<url>/api/authenticate
+    //http://<url>/user-api/authenticate
     router.post('/authenticate', function(req, res) {
         User.findOne({
             username: req.body.username
@@ -72,7 +72,7 @@ module.exports = function(router) {
         });
     });
 
-    //Middleware for the route /api/currentUser to check the status of the token
+    //Middleware for the route /user-api/currentUser to check the status of the token
     router.use('/currentUser', function(req, res, next) {
         var token = req.body.token || req.body.query || req.headers['x-access-token'];
 
@@ -97,8 +97,8 @@ module.exports = function(router) {
     });
 
     //Verifying token route
-    //http://<url>/api/currentUser
-    router.post('/currentUser', function(req, res) {
+    //http://<url>/user-api/currentUser
+    router.get('/currentUser', function(req, res) {
         res.send(req.decoded);
     });
 

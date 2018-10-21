@@ -1,6 +1,5 @@
 /*
     This file contains the schema definition for location.
-    Just a dummy file for testing purposes, will be deleted later
 */
 
 var mongoose = require('mongoose');
@@ -13,9 +12,15 @@ var LocationSchema = new Schema ({
     },
     state: {
         type: String,
+        required: true
     },
-    zipCode: {
-        type: String
+    longitude: {
+        type: Number,
+        required: true
+    },
+    latitude: {
+        type: Number,
+        required: true
     }
 });
 
