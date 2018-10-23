@@ -34,4 +34,14 @@ angular.module('mainController', ['authServices', 'userServices'])
                 $location.path('/home')
             }, 500);
         };
+
+        this.upload = function(file){
+            var f = document.getElementById('myImage').files[0],
+                r = new FileReader();
+
+            console.log('here');
+            r.onload = function(file){
+                console.log('done');
+            }
+        }
     });

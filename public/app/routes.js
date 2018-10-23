@@ -30,6 +30,9 @@ var app = angular.module('appRoutes', ['ngRoute'])
                 controller: 'profileCtrl',
                 controllerAs: 'profileCtrl',
             })
+            .when('/uploadPhoto', {
+                templateUrl: 'app/views/pages/users/uploadPhoto.html',
+            })
             .otherwise({
                 redirectTo: '/'
             });
