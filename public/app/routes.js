@@ -36,6 +36,8 @@ var app = angular.module('appRoutes', ['ngRoute'])
             })
             .when('/uploadPhoto', {
                 templateUrl: 'app/views/pages/users/uploadPhoto.html',
+                controller: 'uploadCtrl',
+                controllerAs: 'uploadCtrl'
             })
             .otherwise({
                 redirectTo: '/'
