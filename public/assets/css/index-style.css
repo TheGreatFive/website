@@ -24,3 +24,8 @@
     min-width: 50%;
     margin-left: 25%;
 }
+
+.uploadedPhotoPreview, .profilePhotos{
+    max-width: 500px;
+    max-height: 500px;
+}

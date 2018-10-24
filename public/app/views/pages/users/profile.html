@@ -15,21 +15,11 @@
             <h1>{{mainCtrl.username}}'s Profile</h1>
         </div>
 
-        <table class="table table-sm table-bordered">
-            <thead class="thead-dark">
-                <tr>
-                    <th scope="col">Username</th>
-                    <th scope="col">Email</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{mainCtrl.username}}</td>
-                    <td>{{mainCtrl.email}}</td>
-                </tr>
-            </tbody>
-        </table>
 
+        <button type="button" class="btn btn-primary" ng-click="profileCtrl.loadPictures(mainCtrl.username)">Load Pictures</button>
+        <img src="" id="StoredImages" />
+
+        <div id="profileImagesId"></div>
     </div>
 
     <div class="MapboxApi" ng-show="profileCtrl.showMap">
