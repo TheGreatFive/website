@@ -2,7 +2,7 @@
     This file contains the uploadController, which is used to upload photos and files
     Also takes care of other input that may come along with uploads
 */
-angular.module('uploadController', ['photoServices'])
+angular.module('uploadController', [])
 
     .directive('ngFiles', function() {
         return {
@@ -23,21 +23,5 @@ angular.module('uploadController', ['photoServices'])
                     }
                 });
             }
-        }
-    })
-
-    .controller('uploadCtrl', function($scope, Photo) {
-        var upload = this;
-
-        // Function to upload image
-        upload.uploadImage = function(username, address){
-            var requestData = {
-                photo: $scope.previewImg.src,
-                username: username,
-                address: address
-            };
-            Photo.storePhoto(requestData).then(function(data){
-                console.log(data.data);
-            });
         }
     });

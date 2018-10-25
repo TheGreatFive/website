@@ -7,7 +7,6 @@ var express = require('express'),
     router = express.Router();
     userAppRoutes = require('./app/routes/user-api')(router),           //User-api routes
     locationAppRoutes = require('./app/routes/location-api')(router);   //location-api routes
-    photoAppRoutes = require('./app/routes/photo-api')(router);         //Photo-api routes
     path = require('path');
 
 var app = express();
@@ -19,7 +18,6 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '50mb'})); //To parse app
 
 app.use('/user-api', userAppRoutes); //Back-end routes user http://<url>/user-api
 app.use('/location-api', locationAppRoutes); //Back-end routes for location http://<url>/location-api
-app.use('/photo-api', photoAppRoutes); //Back-end routes for photos http://<url>/photo-api
 
 app.use(express.static(__dirname + '/public')); //Giving the front-end access to this folder
 

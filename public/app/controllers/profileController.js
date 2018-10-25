@@ -4,7 +4,7 @@
     Includes map functionality to add the heat map layer.
 */
 
-angular.module('profileController', ['locationServices', 'photoServices'])
+angular.module('profileController', ['locationServices'])
 
     //Directive needed to load mapbox onto the screen
     .directive('mapbox', function() {
@@ -160,7 +160,7 @@ angular.module('profileController', ['locationServices', 'photoServices'])
     })
 
     //profileCtrl called in profile.html
-    .controller('profileCtrl', function($scope, Locations, Photo) {
+    .controller('profileCtrl', function($scope, Locations) {
         var profile = this;
         profile.showMap = false;
         profile.showProfile = true;
@@ -195,22 +195,4 @@ angular.module('profileController', ['locationServices', 'photoServices'])
             }
         };
 
-        profile.loadPictures = function(username){
-            var requestData = {
-                photo: username,
-                username: username,
-                address: username
-            };
-
-            Photo.displayPhotos(requestData).then(function(data){
-                for(index in data.data){
-                    console.log(data.data[index].photoData);
-                    var img = document.createElement('img');
-                    img.setAttribute("class", "profilePhotos");
-
-                    img.src = data.data[index].photoData;
-                    profile.images.appendChild(img);
-                }
-            });
-        };
     });
